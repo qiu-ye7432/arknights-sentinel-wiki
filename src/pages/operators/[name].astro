@@ -1,0 +1,123 @@
+
+---
+import Layout from "../../layouts/Layout.astro";
+import { operators } from "../../data/operators";
+
+export function getStaticPaths() {
+    return operators.map((operator) => ({
+        params: {
+            name: operator.name,
+        },
+        props: {
+            operator,
+        },
+    }));
+}
+
+const { operator } = Astro.props;
+---
+
+<Layout>
+    <main class="page">
+        <a href="/operators/" class="back">← 返回干员列表</a>
+
+        <header class="profile">
+            <p class="eyebrow">SENTINEL PROTOCOL</p>
+            <p class="tier">第 {operator.tier} 阶</p>
+            <h1>{operator.name}</h1>
+            <p class="description">卫戍协议参战干员</p>
+        </header>
+
+        <section class="info-card">
+            <h2>基础资料</h2>
+            <div class="info-row">
+                <span>干员名称</span>
+                <strong>{operator.name}</strong>
+            </div>
+            <div class="info-row">
+                <span>协议阶级</span>
+                <strong>第 {operator.tier} 阶</strong>
+            </div>
+        </section>
+
+        <section class="info-card">
+            <h2>技能资料</h2>
+            <p>技能数据待补充。</p>
+        </section>
+
+        <section class="info-card">
+            <h2>属性资料</h2>
+            <p>属性数据待补充。</p>
+        </section>
+
+        <section class="info-card">
+            <h2>机制说明</h2>
+            <p>干员专属机制待补充。</p>
+        </section>
+    </main>
+</Layout>
+
+<style>
+    .page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+        color: #49382d;
+    }
+
+    .back {
+        color: #8c5638;
+        text-decoration: none;
+    }
+
+    .profile {
+        margin: 48px 0 36px;
+    }
+
+    .eyebrow {
+        color: #b87945;
+        letter-spacing: 3px;
+        font-size: 12px;
+    }
+
+    h1 {
+        font-size: 42px;
+        margin: 12px 0;
+    }
+
+    .tier {
+        color: #b87945;
+    }
+
+    .description {
+        color: #8a7868;
+    }
+
+    .info-card {
+        padding: 24px;
+        margin-bottom: 18px;
+        border: 1px solid #e5d2b5;
+        border-radius: 12px;
+        background: #fffaf1;
+    }
+
+    .info-card h2 {
+        margin-top: 0;
+        font-size: 20px;
+    }
+
+    .info-card p {
+        color: #8a7868;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee2d0;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+</style>

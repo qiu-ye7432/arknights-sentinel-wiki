@@ -1,11 +1,581 @@
----
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+const modules = [
+  {
+    icon: "⚔️",
+    title: "干员资料",
+    english: "OPERATORS",
+    description: "查看干员属性、技能、协议效果与实战表现。",
+    href: "#operators",
+    id: "operators",
+    tag: "角色数据库"
+  },
+  {
+    icon: "🛡️",
+    title: "装备与道具",
+    english: "EQUIPMENT",
+    description: "整理装备属性、特殊效果与搭配方案。",
+    href: "#equipment",
+    id: "equipment",
+    tag: "装备数据库"
+  },
+  {
+    icon: "📖",
+    title: "攻略与机制",
+    english: "GUIDES",
+    description: "了解游戏规则、战斗机制与实战攻略。",
+    href: "#guides",
+    id: "guides",
+    tag: "知识库"
+  },
+  {
+    icon: "🧮",
+    title: "数据计算器",
+    english: "CALCULATORS",
+    description: "计算伤害、属性与技能效果，辅助战术分析。",
+    href: "#calculators",
+    id: "calculators",
+    tag: "实用工具"
+  }
+];
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#111820" />
+    <meta name="description" content="明日方舟卫戍协议专题百科，收录干员、技能、装备、攻略与数据计算工具。" />
+    <title>卫戍协议百科 | SENTINEL PROTOCOL</title>
+  </head>
+
+  <body>
+    <header class="navbar">
+      <a class="brand" href="/">
+        <span class="brand-icon">◆</span>
+        <span>卫戍协议百科</span>
+      </a>
+
+      <nav>
+        <a href="/">首页</a>
+        <a href="#operators">干员资料</a>
+        <a href="#equipment">装备道具</a>
+        <a href="#guides">攻略机制</a>
+        <a href="#calculators">计算器</a>
+      </nav>
+
+      <a class="github-link" href="https://github.com/" target="_blank" rel="noreferrer">
+        GitHub ↗
+      </a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <div class="eyebrow">
+            <span class="status-dot"></span>
+            ARKNIGHTS · SENTINEL PROTOCOL
+          </div>
+
+          <h1>
+            探索战术的<br />
+            <span>无限可能。</span>
+          </h1>
+
+          <p class="hero-description">
+            明日方舟 · 卫戍协议专题百科。<br />
+            从干员数据到战斗机制，建立属于你的战术知识库。
+          </p>
+
+          <div class="search-box">
+            <span>⌕</span>
+            <input
+              id="site-search"
+              type="search"
+              placeholder="搜索干员、技能、装备或攻略..."
+              autocomplete="off"
+            />
+            <kbd>SEARCH</kbd>
+          </div>
+
+          <p class="search-hint" id="search-hint">
+            搜索目前支持下方的功能模块，后续将扩展至全部百科资料。
+          </p>
+        </div>
+
+        <div class="hero-decoration">
+          <div class="circle circle-one"></div>
+          <div class="circle circle-two"></div>
+          <div class="decoration-cross">✳</div>
+          <div class="decoration-label">TACTICAL DATABASE<br />EST. 2026</div>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <div class="section-heading">
+          <div>
+            <div class="section-en">DATABASE</div>
+            <h2>资料数据库</h2>
+          </div>
+          <span class="section-note">EXPLORE THE ARCHIVE →</span>
+        </div>
+
+        <div class="module-grid" id="module-grid">
+          {modules.map((item) => (
+            <a
+              class="module-card"
+              href={item.href}
+              data-search={`${item.title} ${item.english} ${item.description} ${item.tag}`}
+              id={item.id}
+            >
+              <div class="card-top">
+                <span class="module-icon">{item.icon}</span>
+                <span class="card-arrow">↗</span>
+              </div>
+
+              <div class="card-tag">{item.tag}</div>
+              <h3>{item.title}</h3>
+              <div class="card-english">{item.english}</div>
+              <p>{item.description}</p>
+            </a>
+          ))}
+        </div>
+
+        <div class="empty-result" id="empty-result" hidden>
+          没有找到匹配的模块，请尝试其他关键词。
+        </div>
+      </section>
+
+      <section class="notice">
+        <div class="notice-icon">ℹ</div>
+        <div>
+          <strong>资料库建设中</strong>
+          <p>目前为网站初始版本，干员、装备及机制资料将在后续逐步整理与录入。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand">◆ 卫戍协议百科</div>
+      <p>ARKNIGHTS · SENTINEL PROTOCOL WIKI</p>
+      <p class="copyright">非官方粉丝资料站，与鹰角网络无隶属关系。</p>
+    </footer>
+
+    <script>
+      const searchInput = document.querySelector("#site-search");
+      const cards = document.querySelectorAll(".module-card");
+      const emptyResult = document.querySelector("#empty-result");
+      const searchHint = document.querySelector("#search-hint");
+
+      searchInput?.addEventListener("input", () => {
+        const keyword = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const content = card.getAttribute("data-search")?.toLowerCase() || "";
+          const matched = content.includes(keyword);
+
+          card.classList.toggle("hidden", !matched);
+          if (matched) visibleCount++;
+        });
+
+        emptyResult.hidden = visibleCount !== 0;
+        searchHint.textContent = keyword
+          ? `找到 ${visibleCount} 个匹配模块`
+          : "搜索目前支持下方的功能模块，后续将扩展至全部百科资料。";
+      });
+    </script>
+
+    <style>
+      
+:root {
+  font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  color: #49382D;
+  background: #F3EBDD;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 80% 5%, #EADBC6 0%, transparent 40%),
+    #F3EBDD;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.navbar {
+  height: 72px;
+  padding: 0 8%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #D9C7AF;
+  background: rgba(243, 235, 221, 0.94);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.brand-icon {
+  color: #B87945;
+  font-size: 25px;
+}
+
+nav {
+  display: flex;
+  gap: 30px;
+  color: #725C49;
+  font-size: 13px;
+}
+
+nav a:hover,
+.github-link:hover {
+  color: #B87945;
+}
+
+.github-link {
+  font-size: 13px;
+  color: #A96E3F;
+}
+
+main {
+  max-width: 1160px;
+  margin: auto;
+  padding: 0 28px;
+}
+
+.hero {
+  min-height: 410px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #D9C7AF;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 65px 0;
+}
+
+.eyebrow,
+.section-en {
+  color: #A96E3F;
+  font-size: 11px;
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: #D69A50;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+h1 {
+  font-size: clamp(42px, 6vw, 66px);
+  line-height: 1.2;
+  letter-spacing: 2px;
+  margin: 28px 0 18px;
+  color: #49382D;
+}
+
+h1 span {
+  color: #B87945;
+}
+
+.hero-description {
+  color: #725C49;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.search-box {
+  margin-top: 28px;
+  width: min(470px, 85vw);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid #CDB99E;
+  background: #FFF9F0;
+  border-radius: 5px;
+  color: #B87945;
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #49382D;
+  font-size: 13px;
+}
+
+.search-box input::placeholder {
+  color: #A18B75;
+}
+
+kbd {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #A18B75;
+}
+
+.search-hint {
+  color: #947D66;
+  font-size: 11px;
+}
+
+.hero-decoration {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: 5%;
+  top: 25px;
+  opacity: 0.65;
+}
+
+.circle {
+  position: absolute;
+  border: 1px solid #CDB99E;
+  border-radius: 50%;
+  transform: rotate(-25deg);
+}
+
+.circle-one {
+  width: 300px;
+  height: 300px;
+  top: 20px;
+  left: 30px;
+}
+
+.circle-two {
+  width: 220px;
+  height: 350px;
+  top: 0;
+  left: 70px;
+  border-color: #B87945;
+}
+
+.decoration-cross {
+  position: absolute;
+  top: 100px;
+  left: 140px;
+  font-size: 100px;
+  color: #B87945;
+}
+
+.decoration-label {
+  position: absolute;
+  right: 0;
+  bottom: 30px;
+  font-size: 10px;
+  line-height: 2;
+  letter-spacing: 2px;
+  color: #947D66;
+}
+
+.content-section {
+  padding: 55px 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+h2 {
+  font-size: 25px;
+  margin: 10px 0 0;
+  color: #49382D;
+}
+
+.section-note {
+  font-size: 10px;
+  color: #947D66;
+  letter-spacing: 1px;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.module-card {
+  min-height: 220px;
+  padding: 22px;
+  background: #FFF9F0;
+  border: 1px solid #E1D0B9;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  border-color: #B87945;
+  background: #FFFFFF;
+  box-shadow: 0 8px 24px rgba(112, 77, 46, 0.08);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.module-icon {
+  font-size: 26px;
+}
+
+.card-arrow {
+  color: #A18B75;
+}
+
+.card-tag {
+  margin-top: 22px;
+  color: #B87945;
+  font-size: 10px;
+}
+
+h3 {
+  margin: 9px 0;
+  font-size: 18px;
+  color: #49382D;
+}
+
+.card-english {
+  color: #A18B75;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.module-card p {
+  color: #725C49;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.hidden {
+  display: none;
+}
+
+.empty-result {
+  padding: 30px;
+  text-align: center;
+  color: #725C49;
+}
+
+.notice {
+  display: flex;
+  gap: 16px;
+  padding: 22px;
+  margin-bottom: 55px;
+  background: #EADBC6;
+  border-left: 3px solid #B87945;
+}
+
+.notice-icon {
+  color: #B87945;
+  font-size: 20px;
+}
+
+.notice strong {
+  font-size: 13px;
+  color: #49382D;
+}
+
+.notice p {
+  color: #725C49;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 0;
+}
+
+footer {
+  border-top: 1px solid #D9C7AF;
+  padding: 30px 20px;
+  text-align: center;
+  color: #947D66;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.footer-brand {
+  color: #A96E3F;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.copyright {
+  letter-spacing: 0;
+}
+
+@media (max-width: 850px) {
+  .module-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  nav {
+    gap: 12px;
+  }
+
+  .hero-decoration {
+    opacity: 0.2;
+    right: -100px;
+  }
+}
+
+@media (max-width: 560px) {
+  .navbar {
+    padding: 0 18px;
+  }
+
+  nav {
+    display: none;
+  }
+
+  main {
+    padding: 0 18px;
+  }
+
+  .hero {
+    min-height: 370px;
+  }
+
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-note {
+    display: none;
+  }
+}
+
+    </style>
+  </body>
+</html>

@@ -1,0 +1,235 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import {operators} from "../../data/operators";
+
+const tiers = [1, 2, 3, 4, 5, 6];
+---
+
+<Layout>
+    <main class="page">
+        <header class="page-header">
+            <a href="/" class="back">← 返回首页</a>
+            <p class="eyebrow">SENTINEL PROTOCOL</p>
+            <h1>参战干员</h1>
+            <p class="description">
+                卫戍协议参战干员一览
+            </p>
+        </header>
+
+        <section class="toolbar">
+            <input
+                    id="search"
+                    type="search"
+                    placeholder="搜索干员名称..."
+                    aria-label="搜索干员"
+            />
+
+            <div class="filters">
+                <button class="active" data-tier="all">全部</button>
+                {tiers.map((tier) => (
+                        <button data-tier={tier}>{`第 ${tier} 阶`}</button>
+                ))}
+            </div>
+        </section>
+
+        <p class="count" id="count">
+            共 {operators.length} 名干员
+        </p>
+
+        <section class="operator-grid" id="operator-grid">
+            {operators.map((operator) => (
+                    <a
+                            class="operator-card"
+                            href={`/operators/${encodeURIComponent(operator.name)}/`}
+                            data-name={operator.name}
+                            data-tier={operator.tier}
+                    >
+                        <span class="tier">第 {operator.tier} 阶</span>
+                        <h2>{operator.name}</h2>
+                        <span class="card-link">查看详情 →</span>
+                    </a>
+            ))}
+        </section>
+
+        <p class="empty" id="empty" hidden>
+            没有找到符合条件的干员。
+        </p>
+    </main>
+</Layout>
+
+<script>
+    const search = document.querySelector<HTMLInputElement>("#search")!;
+    const cards = Array.from(
+        document.querySelectorAll<HTMLElement>(".operator-card"),
+    );
+    const buttons = document.querySelectorAll<HTMLButtonElement>("[data-tier]");
+    const count = document.querySelector("#count")!;
+    const empty = document.querySelector<HTMLElement>("#empty")!;
+
+    let selectedTier = "all";
+
+    function update() {
+        const keyword = search.value.trim().toLowerCase();
+        let visible = 0;
+
+        cards.forEach((card) => {
+            const name = card.dataset.name?.toLowerCase() ?? "";
+            const tier = card.dataset.tier ?? "";
+
+            const matchesName = name.includes(keyword);
+            const matchesTier =
+                selectedTier === "all" || tier === selectedTier;
+
+            const show = matchesName && matchesTier;
+            card.hidden = !show;
+
+            if (show) visible++;
+        });
+
+        count.textContent = `找到 ${visible} 名干员`;
+        empty.hidden = visible !== 0;
+    }
+
+    search.addEventListener("input", update);
+
+    buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+            selectedTier = button.dataset.tier ?? "all";
+
+            buttons.forEach((item) => {
+                item.classList.toggle("active", item === button);
+            });
+
+            update();
+        });
+    });
+</script>
+
+<style>
+    .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+        color: #49382d;
+    }
+
+    .page-header {
+        margin-bottom: 36px;
+    }
+
+    .back {
+        color: #8c5638;
+        text-decoration: none;
+    }
+
+    .eyebrow {
+        margin-top: 40px;
+        color: #b87945;
+        letter-spacing: 3px;
+        font-size: 12px;
+    }
+
+    h1 {
+        font-size: 40px;
+        margin: 12px 0;
+    }
+
+    .description {
+        color: #8a7868;
+    }
+
+    .toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    #search {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 16px;
+        border: 1px solid #d8c3a8;
+        border-radius: 10px;
+        background: #fffaf1;
+        color: #49382d;
+        font-size: 15px;
+    }
+
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .filters button {
+        padding: 9px 16px;
+        border: 1px solid #d8c3a8;
+        border-radius: 20px;
+        background: #f3ebdd;
+        color: #76563e;
+        cursor: pointer;
+    }
+
+    .filters button.active {
+        background: #8c5638;
+        color: white;
+        border-color: #8c5638;
+    }
+
+    .count {
+        margin: 28px 0 16px;
+        color: #8a7868;
+        font-size: 14px;
+    }
+
+    .operator-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .operator-card {
+        padding: 20px;
+        border: 1px solid #e5d2b5;
+        border-radius: 12px;
+        background: #fffaf1;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: block;
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .operator-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px #49382d18;
+    }
+
+    .operator-card h2 {
+        margin: 12px 0 0;
+        font-size: 17px;
+    }
+
+    .tier {
+        color: #b87945;
+        font-size: 12px;
+    }
+
+    .empty {
+        padding: 40px;
+        text-align: center;
+        color: #8a7868;
+    }
+
+    @media (max-width: 750px) {
+        .operator-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 420px) {
+        .operator-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
